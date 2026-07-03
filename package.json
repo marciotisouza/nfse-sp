@@ -1,0 +1,59 @@
+{
+  "name": "nfse-sp",
+  "version": "0.1.0",
+  "description": "Cliente Node.js para emissão de NFS-e no WebService da Prefeitura de São Paulo (lotenfe.asmx). Suporta emissão individual e em lote, consulta, cancelamento e assinatura digital com certificado A1.",
+  "type": "module",
+  "main": "./dist/index.js",
+  "types": "./dist/index.d.ts",
+  "exports": {
+    ".": {
+      "import": "./dist/index.js",
+      "types": "./dist/index.d.ts"
+    }
+  },
+  "files": [
+    "dist",
+    "README.md",
+    "LICENSE"
+  ],
+  "scripts": {
+    "build": "tsc",
+    "build:watch": "tsc --watch",
+    "prepublishOnly": "npm run build"
+  },
+  "keywords": [
+    "nfse",
+    "nfse-sp",
+    "nota-fiscal",
+    "nota-fiscal-servico",
+    "prefeitura-sp",
+    "sao-paulo",
+    "soap",
+    "certificado-a1",
+    "xml-dsig"
+  ],
+  "author": "Marcio de Souza <marcio.ti.souza@gmail.com>",
+  "license": "MIT",
+  "repository": {
+    "type": "git",
+    "url": "https://github.com/marcio-ti-souza/nfse-sp.git"
+  },
+  "bugs": {
+    "url": "https://github.com/marcio-ti-souza/nfse-sp/issues"
+  },
+  "homepage": "https://github.com/marcio-ti-souza/nfse-sp#readme",
+  "engines": {
+    "node": ">=18"
+  },
+  "dependencies": {
+    "@xmldom/xmldom": "^0.9.8",
+    "axios": "^1.9.0",
+    "node-forge": "^1.3.1",
+    "xml-crypto": "^6.0.1"
+  },
+  "devDependencies": {
+    "@types/node": "^22.0.0",
+    "@types/node-forge": "^1.3.11",
+    "typescript": "^5.8.3"
+  }
+}
