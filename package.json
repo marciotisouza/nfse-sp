@@ -1,6 +1,6 @@
 {
   "name": "nfse-sp",
-  "version": "0.1.0",
+  "version": "0.1.1",
   "description": "Cliente Node.js para emissão de NFS-e no WebService da Prefeitura de São Paulo (lotenfe.asmx). Suporta emissão individual e em lote, consulta, cancelamento e assinatura digital com certificado A1.",
   "type": "module",
   "main": "./dist/index.js",
@@ -19,6 +19,7 @@
   "scripts": {
     "build": "tsc",
     "build:watch": "tsc --watch",
+    "prepare": "npm run build",
     "prepublishOnly": "npm run build"
   },
   "keywords": [

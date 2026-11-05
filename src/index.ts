@@ -9,7 +9,7 @@ export type { DadosRps } from './rps.js'
 export { cancelarNfse } from './cancel.js'
 export { consultarLote, consultarNfePorRps } from './query.js'
 export { assinarXmlDocumento } from './sign.js'
-export { extrairDadosCertificado } from './certificate.js'
+export { extrairDadosCertificado, extrairPemTls } from './certificate.js'
 export type { CertificateData } from './certificate.js'
 
 // Tipos do retorno SOAP

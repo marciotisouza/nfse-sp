@@ -1,6 +1,7 @@
 import * as https from 'https'
 import axios from 'axios'
 import { DOMParser } from '@xmldom/xmldom'
+import { extrairPemTls } from './certificate.js'
 
 const WS_URL = 'https://nfe.prefeitura.sp.gov.br/ws/lotenfe.asmx'
 const NS     = 'http://www.prefeitura.sp.gov.br/nfe'
@@ -50,9 +51,9 @@ export async function executarRequisicaoSoap(
   </soap:Body>
 </soap:Envelope>`.trim()
 
+  // key/cert PEM em vez de { pfx, passphrase }: o Node 22 / OpenSSL 3 recusa o .pfx legado.
   const httpsAgent = new https.Agent({
-    pfx: pfxBuf,
-    passphrase: pfxSenha,
+    ...extrairPemTls(pfxBuf, pfxSenha),
     rejectUnauthorized: true,
   })
 

@@ -18,7 +18,7 @@ Extraído do sistema `tickets.com` (em `/mnt/nve/var/www/tickets.com/`) onde foi
 - `node-forge` — extração de chave/cert do .pfx (PKCS#12)
 - `xml-crypto` v6 — assinatura XML-DSig enveloped
 - `@xmldom/xmldom` — parse do XML de resposta SOAP
-- `axios` — requisição SOAP com mTLS (https.Agent com pfx/passphrase)
+- `axios` — requisição SOAP com mTLS (https.Agent com key/cert PEM extraídos via node-forge — o Node 22 recusa o .pfx legado em `{ pfx, passphrase }`)
 
 ## Estrutura de arquivos
 
@@ -86,6 +86,7 @@ A ideia é que outros projetos usem este pacote e implementem a camada de aplica
 | [1206] | Assinatura SHA1 do RPS errada | Ordem dos campos + indicador numérico ('2'/'1') |
 | [318]  | Cidade/UF do tomador ausente | `<EnderecoTomador>` com código IBGE |
 | [306]  | Código de serviço inválido | Verificar código junto ao contador/Prefeitura |
+| `Unsupported PKCS12 PFX data` | Node 22/OpenSSL 3 + .pfx legado | `extrairPemTls()` (key/cert PEM) no https.Agent |
 
 ## Publicação
 

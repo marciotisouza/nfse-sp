@@ -12,7 +12,7 @@ npm install nfse-sp
 
 ## Pré-requisitos
 
-- Node.js >= 18
+- Node.js >= 18 (testado no Node 22 — o mTLS usa key/cert PEM extraídos do .pfx, compatível com certificados A1 de cifra legada)
 - Certificado A1 (arquivo `.pfx`/`.p12`) emitido para o CNPJ do prestador
 - Inscrição municipal ativa na Prefeitura de São Paulo
 - Código de serviço LC 116/2003 cadastrado no CNPJ do prestador junto ao fisco SP
