@@ -4,7 +4,7 @@
 
 Pacote npm open-source que encapsula a integração com o WebService SOAP da **Prefeitura de São Paulo** para emissão de NFS-e (Nota Fiscal de Serviço Eletrônica).
 
-Extraído do sistema `tickets.com` (em `/mnt/nve/var/www/tickets.com/`) onde foi desenvolvido e testado em produção. A lógica de aplicação (banco de dados, rotas Express, busca IBGE) ficou no sistema de origem — este pacote contém apenas a camada de comunicação com a Prefeitura.
+Extraído do sistema de origem (tickets v2, privado), onde foi desenvolvido e testado em produção. A lógica de aplicação (banco de dados, rotas Express, busca IBGE) ficou no sistema de origem — este pacote contém apenas a camada de comunicação com a Prefeitura.
 
 ## Autor e contas
 
@@ -18,17 +18,20 @@ Extraído do sistema `tickets.com` (em `/mnt/nve/var/www/tickets.com/`) onde foi
 - `node-forge` — extração de chave/cert do .pfx (PKCS#12)
 - `xml-crypto` v6 — assinatura XML-DSig enveloped
 - `@xmldom/xmldom` — parse do XML de resposta SOAP
+- `fast-xml-parser` — leitura do XML da NFS-e para a impressão
+- `puppeteer` (peer opcional) — PDF
 - `axios` — requisição SOAP com mTLS (https.Agent com key/cert PEM extraídos via node-forge — o Node 22 recusa o .pfx legado em `{ pfx, passphrase }`)
 
 ## Estrutura de arquivos
 
 ```
 src/
-  certificate.ts  — extrairDadosCertificado(): extrai chave privada e cert do .pfx
+  certificate.ts  — extrairDadosCertificado(), extrairPemTls() (mTLS), verificarCertificado()
   sign.ts         — assinarXmlDocumento(): XML-DSig com xpath:'/*' (1 referência)
   soap.ts         — executarRequisicaoSoap() + interpretarResposta() + RetornoSoap
   rps.ts          — DadosRps, gerarAssinaturaRps(), enviarLoteRps()
   cancel.ts       — cancelarNfse()
+  pdf.ts          — gerarNfseHtml(), gerarNfsePdf() (impressão)
   query.ts        — consultarLote(), consultarNfePorRps()
   client.ts       — NfseSpClient (API principal de alto nível) + NfseSpConfig
   index.ts        — re-exports públicos
@@ -66,10 +69,7 @@ SOAPAction: `"http://www.prefeitura.sp.gov.br/nfe/ws/<acao>"`
 
 ## Origem: sistema tickets.com
 
-O módulo original fica em:
-```
-/mnt/nve/var/www/tickets.com/v2/server/src/modules/nfse_sp/
-```
+O módulo original fica no sistema de origem, em `server/src/modules/nfse_sp/`.
 
 Além do código deste pacote, o sistema de origem contém:
 - `nfse-sp.service.ts` — camada de aplicação (busca IBGE, persistência no banco, guards de duplicação)
@@ -77,6 +77,19 @@ Além do código deste pacote, o sistema de origem contém:
 - `config.ts` — lê vars de ambiente e monta NfseSpConfig
 
 A ideia é que outros projetos usem este pacote e implementem a camada de aplicação adequada para seu contexto.
+
+## Impressão (`src/pdf.ts`)
+
+`gerarNfseHtml(xml)` / `gerarNfsePdf(xml, { browser? })`: PDF local a partir do XML da Prefeitura.
+Lê o leiaute real do webservice (`RazaoSocialPrestador`, `CPFCNPJTomador`, `EnderecoTomador`,
+`DataEmissaoNFe`, `AliquotaServicos`...) e o agrupado (`Prestador`/`Tomador`). `puppeteer` é peer
+dependency opcional; `printBackground: true` é necessário (cabeçalhos com fundo azul).
+
+## Certificado
+
+`verificarCertificado(pfx, senha, { diasAviso })` e `client.certificado()`: titular, CNPJ/CPF (lidos do
+subjectAltName ICP-Brasil, OIDs 2.16.76.1.3.x, ou do CN), emissor, validade, `diasRestantes`,
+`expirado`, `vencendo`, `cnpjConfere`. Senha errada lança erro.
 
 ## Erros comuns já resolvidos (não regredir)
 
@@ -94,3 +107,5 @@ A ideia é que outros projetos usem este pacote e implementem a camada de aplica
 - `npm publish` — publica no npm (requer `npm login`)
 - O `prepublishOnly` roda o build automaticamente
 - Arquivos publicados: `dist/`, `README.md`, `LICENSE`
+
+Pacote irmão: `nfse-nacional` (NFS-e padrão nacional, obrigatória para o Simples desde 11/2026).

@@ -2,6 +2,7 @@ import { enviarLoteRps, type DadosRps } from './rps.js'
 import { cancelarNfse } from './cancel.js'
 import { consultarLote, consultarNfePorRps } from './query.js'
 import type { RetornoSoap } from './soap.js'
+import { verificarCertificado, type InfoCertificado } from './certificate.js'
 
 export interface NfseSpConfig {
   /** Buffer do arquivo .pfx/.p12 do certificado A1 */
@@ -106,5 +107,14 @@ export class NfseSpClient {
       this.config.pfxSenha,
       this.config.cnpjPrestador,
     )
+  }
+
+  /**
+   * Dados e validade do certificado A1 configurado, e se o CNPJ dele confere com `cnpjPrestador`.
+   * Útil num health-check: `if (info.expirado || info.vencendo || !info.cnpjConfere) avisar()`.
+   */
+  certificado(opcoes: { diasAviso?: number } = {}): InfoCertificado & { cnpjConfere: boolean } {
+    const info = verificarCertificado(this.config.pfxBuf, this.config.pfxSenha, opcoes)
+    return { ...info, cnpjConfere: info.cnpj === this.config.cnpjPrestador.replace(/\D/g, '') }
   }
 }

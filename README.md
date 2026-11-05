@@ -155,6 +155,31 @@ const sp = municipios.find(m => m.nome === 'São Paulo')
 console.log(sp.id) // 3550308
 ```
 
+## Impressão (PDF da NFS-e)
+
+```ts
+import { gerarNfseHtml, gerarNfsePdf } from 'nfse-sp'
+
+const pdf = await gerarNfsePdf(xmlDaNota)          // requer: npm i puppeteer
+const html = gerarNfseHtml(xmlDaNota)              // só o HTML, para o seu conversor
+```
+
+Gera o PDF local a partir do XML retornado pela Prefeitura (`consultarPorRps`, `consultarLote`).
+Para lote, passe um browser puppeteer aberto: `gerarNfsePdf(xml, { browser })`. Em servidor Linux sem
+Chrome, o Chromium do puppeteer precisa de `libgbm1` e `libasound2`.
+
+## Certificado (dados e validade)
+
+```ts
+const info = client.certificado({ diasAviso: 30 })
+// { titular, cnpj, cpf, emissor, numeroSerie, validoDe, validoAte,
+//   diasRestantes, expirado, vencendo, aindaNaoValido, cnpjConfere }
+if (info.expirado || info.vencendo || !info.cnpjConfere) alertar(info)
+```
+
+Também como função solta: `verificarCertificado(pfxBuf, senha, { diasAviso })`. Senha incorreta ou
+arquivo inválido lança erro.
+
 ## Funções de baixo nível
 
 Para casos avançados, todas as funções internas também são exportadas:
@@ -162,6 +187,10 @@ Para casos avançados, todas as funções internas também são exportadas:
 ```typescript
 import {
   extrairDadosCertificado,
+  extrairPemTls,
+  verificarCertificado,
+  gerarNfseHtml,
+  gerarNfsePdf,
   assinarXmlDocumento,
   gerarAssinaturaRps,
   enviarLoteRps,
@@ -170,6 +199,9 @@ import {
   consultarNfePorRps,
 } from 'nfse-sp'
 ```
+
+Pacote irmão para a NFS-e padrão nacional (obrigatória para o Simples desde 11/2026):
+[nfse-nacional](https://github.com/marciotisouza/nfse-nacional).
 
 ## Licença
 
